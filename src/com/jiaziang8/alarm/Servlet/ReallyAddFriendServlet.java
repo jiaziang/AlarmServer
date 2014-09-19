@@ -55,6 +55,7 @@ public class ReallyAddFriendServlet extends HttpServlet {
 			friend = friend.substring(3);
 		}
 		try {
+			getConnection();
 			rs = statement
 					.executeQuery("select *from user where account=" + user);
 			rs.beforeFirst();

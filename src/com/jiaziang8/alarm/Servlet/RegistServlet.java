@@ -61,10 +61,9 @@ public class RegistServlet extends HttpServlet {
 		if(username.indexOf("+86")==0){
 			username = username.substring(3);
 		}
-		System.out.println("Regist::::::::username:" + username
-				+ "-----password:" + userpwd);
 
 		try {
+			getConnection();
 			rs = statement
 					.executeQuery("select * from user where account='"
 							+ username + "'");

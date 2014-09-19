@@ -51,6 +51,7 @@ public class UploadImgServlet extends HttpServlet {
 		statement = null;
 		try {
 			// 对base64数据进行解码
+			getConnection();
 			byte[] decode = Base64.decode(photo);
 			File savePath = new File(
 					Constants.HEAD_IMAGE_PATH);
