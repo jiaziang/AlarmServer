@@ -32,7 +32,7 @@ public class CheckServlet extends HttpServlet {
 			Class.forName(DRIVER);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 	protected void doGet(HttpServletRequest request,
@@ -52,16 +52,19 @@ public class CheckServlet extends HttpServlet {
 			getConnection();
 			rs = statement
 					.executeQuery("select *from checkuser where account='"
-							+ username + "' and checknumber="+checknumber);
+							+ username + "' and checknumber=" + checknumber);
 			rs.beforeFirst();
-			if(rs.next()){
+			if (rs.next()) {
 				System.out.println("验证码正确,注册成功!");
 				String password = rs.getString("password");
-				int rs2 = statement.executeUpdate("insert into user(account,password,friends)  values('"+username+"','"+password+"','')");
-				int rs3=statement.executeUpdate("delete from checkuser where account="+username);
+				int rs2 = statement
+						.executeUpdate("insert into user(account,password,friends)  values('"
+								+ username + "','" + password + "','')");
+				int rs3 = statement
+						.executeUpdate("delete from checkuser where account="
+								+ username);
 				response.setStatus(201);
-			}
-			else  {
+			} else {
 				response.setStatus(202);
 			}
 			rs.close();
@@ -70,43 +73,43 @@ public class CheckServlet extends HttpServlet {
 			statement = null;
 			con.close();
 			con = null;
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally{
-			if(rs!=null){
+		} finally {
+			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			
-			if(statement!=null){
+
+			if (statement != null) {
 				try {
 					statement.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			
-			if(con!=null){
+
+			if (con != null) {
 				try {
 					con.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			}			
+			}
 		}
 	}
-	
-	public void getConnection(){
+
+	public void getConnection() {
 		try {
 			con = DriverManager.getConnection(CONNECT, user, password);
 			statement = con.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}		
+		}
 	}
-	
+
 }

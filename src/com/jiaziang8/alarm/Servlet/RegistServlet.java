@@ -27,18 +27,15 @@ public class RegistServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String DRIVER = "com.mysql.jdbc.Driver";
 	private static final String CONNECT = "jdbc:mysql://localhost:3306/alarm?useUnicode=true&characterEncoding=utf8";
-	private static final String LOGIN_POST = "LOGIN";
-	private static final String REGIST_POST = "REGIST";
 	static String user = Constants.MYSQL_ACCOUNT;
 	static String password = Constants.MYSQL_PASSWORD;
 	private Connection con;
 	private Statement statement;
-	private Random random;
+	private Statement statement2;
 
 	public RegistServlet() {
 		super();
 		System.out.println("Regist Start!!!!!!!!!!!!!!!!!~~~~");
-		random = new Random(49);
 		try {
 			Class.forName(DRIVER);
 		} catch (ClassNotFoundException e) {
@@ -57,7 +54,9 @@ public class RegistServlet extends HttpServlet {
 		String userpwd = request.getParameter("userpwd");
 		con = null;
 		statement = null;
+		statement2 = null;
 		ResultSet rs = null;
+		ResultSet rs2 = null;
 		if(username.indexOf("+86")==0){
 			username = username.substring(3);
 		}
@@ -71,33 +70,38 @@ public class RegistServlet extends HttpServlet {
 			if (rs.next()) {
 				response.setStatus(202);
 			} else {
-				ResultSet rs2 = statement
+				rs2 = statement2
 						.executeQuery("select *from checkuser where account="
 								+ username);
 				rs2.beforeFirst();
 				if (rs2.next()) {
+					int checknumber = getRandom();
 					String sql2 = "update checkuser set checknumber=? where account=?";
 					java.sql.PreparedStatement pStatement = con
 							.prepareStatement(sql2);
-					pStatement.setInt(1, 123456);
+					pStatement.setInt(1, checknumber);
 					pStatement.setString(2, username);
 					pStatement.executeUpdate();
+					sendCheckNumber(checknumber,username);
 				} else {
 					int checknumber = getRandom();
-					sendCheckNumber(checknumber,username);
+					
 					String sql3 = "insert into checkuser(account,password,checknumber) values('"
 							+ username + "','" + userpwd + "'," + checknumber + ")";
-					System.out.println(sql3);
 					int count = statement.executeUpdate(sql3);
-					System.out.println("向checknumber插入了" + count + "条数据");
+					sendCheckNumber(checknumber,username);
 				}
 				response.setStatus(201);
 			}
 			
 			rs.close();
 			rs = null;
+			rs2.close();
+			rs2 = null;
 			statement.close();
 			statement = null;
+			statement2.close();
+			statement2 = null;
 			con.close();
 			con = null;
 
@@ -115,10 +119,25 @@ public class RegistServlet extends HttpServlet {
 					e.printStackTrace();
 				}
 			}
+			if(rs2!=null){
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 			
 			if(statement!=null){
 				try {
 					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			if(statement2!=null){
+				try {
+					statement2.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -175,6 +194,7 @@ public class RegistServlet extends HttpServlet {
 		try {
 			con = DriverManager.getConnection(CONNECT, user, password);
 			statement = con.createStatement();
+			statement2 = con.createStatement();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}		

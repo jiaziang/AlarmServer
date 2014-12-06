@@ -91,6 +91,7 @@ public class DownLoadServlet extends HttpServlet {
 				servletOS.close();
 			}
 		}
+		else throw new NullPointerException("file is not found~");
 		try {
 			getConnection();
 			String chagesql = "update savedAlarm set isAccept=1 where id="+id;
@@ -136,7 +137,7 @@ public class DownLoadServlet extends HttpServlet {
 		String pushMessageString = gson.toJson(pushMessage);
 		JPushClient jPushClient = new JPushClient(Constants.masterSecret,
 				Constants.appKey, false, 86400);
-		Audience audience = Audience.alias(friend);
+		Audience audience = Audience.alias(account);
 		Platform platform = Platform.android();
 		AndroidNotification androidNotification = AndroidNotification
 				.newBuilder().addExtra("pushMessage", pushMessageString)
